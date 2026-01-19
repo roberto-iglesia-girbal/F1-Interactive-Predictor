@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Race Simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Simulador del Campeonato Mundial de Formula 1 - Temporada 2026</h1>
+    </header>
+
+    <main>
+        <section id="config-panel">
+            <h2>Predicción de Carrera 2026</h2>
+            
+            <div class="form-group">
+                <label for="event-select-input">Seleccionar Gran Premio (Calendario 2026):</label>
+                <div class="select-wrapper">
+                    <div id="event-select-combobox"
+                         class="circuit-combobox"
+                         role="combobox"
+                         aria-haspopup="listbox"
+                         aria-expanded="false"
+                         aria-owns="event-select-listbox">
+                        <div class="circuit-combobox-input-wrapper">
+                            <input id="event-select-input"
+                                   type="text"
+                                   autocomplete="off"
+                                   placeholder="Buscar Gran Premio..."
+                                   aria-autocomplete="list"
+                                   aria-controls="event-select-listbox" />
+                            <button type="button"
+                                    id="event-select-toggle"
+                                    class="circuit-combobox-toggle"
+                                    aria-label="Abrir selector de circuitos">
+                                ▾
+                            </button>
+                        </div>
+                        <div id="event-select-dropdown"
+                             class="circuit-combobox-dropdown"
+                             role="listbox"
+                             tabindex="-1">
+                        </div>
+                    </div>
+                    <select id="event-select" disabled hidden>
+                        <option value="">Cargando calendario 2026...</option>
+                    </select>
+                    <span id="loading-indicator" class="loading-spinner hidden" title="Cargando datos...">↻</span>
+                </div>
+                <div id="connection-status" class="status-text">Conectando a FastF1...</div>
+            </div>
+
+            <div id="grid-preview-container" class="form-group hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0;">Parrilla de Salida</h3>
+                </div>
+                <div id="grid-list" class="drivers-grid" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+            </div>
+
+            <button id="start-sim-btn" disabled>Iniciar simulación</button>
+        </section>
+
+        <section id="simulation-panel" class="hidden">
+            <div class="sim-header">
+                <h2 id="race-title" class="race-title">Carrera</h2>
+                <div id="race-subtitle" class="race-subtitle"></div>
+                <div id="sim-error-indicator" class="error-indicator hidden">Error visualización</div>
+                <div class="controls-container">
+                    <div class="controls-timeline" id="timeline-container">
+                        <input type="range" id="time-scrubber" min="0" max="0" value="0" step="0.05" aria-label="Línea de tiempo">
+                        <div id="scrubber-tooltip" class="timeline-tooltip hidden"></div>
+                    </div>
+                    <div class="controls-row">
+                        <div class="controls-transport">
+                            <button id="play-pause-btn" title="Pausa / Reanudar" aria-label="Pausa o reanudar">Reanudar</button>
+                        </div>
+                        <div class="controls-speed">
+                            <span id="sim-status-indicator" class="status-indicator">OFF</span>
+                            <label for="speed-select" class="speed-label">Velocidad</label>
+                            <select id="speed-select" aria-label="Velocidad de simulación" title="Cambiar velocidad">
+                                <option value="0.5">0.5x</option>
+                                <option value="1.0" selected>1x</option>
+                                <option value="2.0">2x</option>
+                                <option value="5.0">5x</option>
+                                <option value="10.0">10x</option>
+                            </select>
+                            <span id="speed-val" class="speed-val">1.0x</span>
+                        </div>
+                    </div>
+                    <div class="controls-info">
+                        <span id="timer">00:00.00</span>
+                        <span id="timer-remaining" class="timer-remaining">-00:00.00</span>
+                        <span>Vuelta: <span id="current-lap">0</span>/<span id="total-laps">0</span></span>
+                        <button id="predictive-metrics-btn" class="hidden" style="margin-left: 10px; background: #6f42c1; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Métricas 2026</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sim-content">
+                <div class="track-dashboard-wrapper">
+                    <div class="track-and-data">
+                        <div id="track-container">
+                            <div class="canvas-controls">
+                                <button id="zoom-in" title="Acercar">+</button>
+                                <button id="zoom-out" title="Alejar">-</button>
+                                <button id="zoom-reset" title="Restablecer vista">Reset</button>
+                                <input type="range" id="rotation-slider" min="0" max="360" value="0" title="Rotar mapa">
+                            </div>
+                            <canvas id="race-canvas" width="800" height="600"></canvas>
+                            <div id="tooltip" class="tooltip hidden"></div>
+                        </div>
+                        <aside id="data-panel" class="data-panel">
+                            <div id="leaderboard">
+                                <div class="leaderboard-main">
+                                    <div class="leaderboard-header">
+                                        <div class="lb-h-pos" data-sort="pos" title="Ordenar por Posición">Pos</div>
+                                        <div class="lb-h-name" data-sort="name" title="Ordenar por Nombre">Piloto</div>
+                                        <div class="lb-h-change" data-sort="change" title="Ordenar por Ganancia/Pérdida vs Parrilla">+/-</div>
+                                        <div class="lb-h-team" data-sort="team" title="Ordenar por Escudería">Escudería</div>
+                                        <div class="lb-h-dorsal">No.</div>
+                                    </div>
+                                    <div class="leaderboard-container"></div>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div id="race-summary" class="race-summary hidden">
+                <h3 class="race-summary-title">Resumen de Carrera</h3>
+                <div class="summary-content-flex">
+                    <div class="race-summary-table-wrapper">
+                        <table class="race-summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Piloto</th>
+                                    <th>Posición Inicial</th>
+                                    <th>Posición Final</th>
+                                    <th>Diferencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="race-summary-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="new-sim-bar">
+                <button id="new-sim-btn" type="button" class="new-sim-btn">Nueva simulación</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="metrics-modal" class="modal hidden">
+        <div class="modal-content metrics-modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Análisis Predictivo 2026</h2>
+                <button id="close-metrics-btn" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="metrics-content"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
