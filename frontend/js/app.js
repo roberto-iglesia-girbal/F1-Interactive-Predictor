@@ -408,7 +408,7 @@ const F1Sim = {
 
         async fetchEvents(year, activeOnly) {
             try {
-                const url = new URL(`${F1Sim.Constants.API_URL}/events`);
+                const url = new URL(`${F1Sim.Constants.API_URL}/events`, window.location.origin);
                 if (year) {
                     url.searchParams.set('year', year);
                 }
@@ -436,7 +436,7 @@ const F1Sim = {
 
         async fetchDrivers(eventId) {
             try {
-                const url = new URL(`${F1Sim.Constants.API_URL}/drivers`);
+                const url = new URL(`${F1Sim.Constants.API_URL}/drivers`, window.location.origin);
                 url.searchParams.set('event_id', eventId);
                 const res = await fetch(url.toString());
                 return await res.json();
