@@ -102,7 +102,7 @@ class PrecisePlaybackClock {
 const F1Sim = {
     // --- Constants ---
     Constants: {
-        API_URL: 'http://localhost:5050/api',
+        API_URL: '/api',
         LEADERBOARD_ROW_HEIGHT: 44,
         COMPOUND_COLORS: {
             'SOFT': '#ff3b30',

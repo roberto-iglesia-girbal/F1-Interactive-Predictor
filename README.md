@@ -27,8 +27,8 @@ run_simulation.bat
 - Linux / Mac
 Dale permisos de ejecución y corre el script:
 ```bash
-chmod +x run_simulation.sh
-./run_simulation.sh
+chmod +x startup.sh
+./startup.sh
 ```
 
 ### Manual
