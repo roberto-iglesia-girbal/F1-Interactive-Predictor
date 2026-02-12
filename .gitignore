@@ -38,4 +38,5 @@ ENV/
 Thumbs.db
 
 # Github
-.github/
+.github/workflows/main_f1-interactive-predictor.yml
+.gitignore
