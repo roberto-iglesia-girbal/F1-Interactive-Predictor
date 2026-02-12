@@ -102,7 +102,24 @@ class PrecisePlaybackClock {
 const F1Sim = {
     // --- Constants ---
     Constants: {
-        API_URL: '/api',
+        API_URL: (function() {
+            const protocol = window.location.protocol;
+            const port = window.location.port;
+            
+            // 1. Acceso local por archivo (file://) -> Asumir backend en puerto 5050
+            if (protocol === 'file:') return 'http://localhost:5050/api';
+            
+            // 2. Si estamos en el puerto del backend (5050), usar ruta relativa
+            if (port === '5050') return '/api';
+            
+            // 3. Si estamos en desarrollo local (ej. Live Server 5500), apuntar al backend 5050
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://localhost:5050/api';
+            }
+            
+            // 4. Producción / Azure (mismo origen)
+            return '/api';
+        })(),
         LEADERBOARD_ROW_HEIGHT: 44,
         COMPOUND_COLORS: {
             'SOFT': '#ff3b30',
