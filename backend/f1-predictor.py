@@ -36,7 +36,7 @@ logging.getLogger("fastf1.events").setLevel(logging.ERROR)
 # ==========================================
 # CONFIGURATION & CONSTANTS
 # ==========================================
-PORT = 5050
+PORT = int(os.environ.get('PORT', 5050))
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
@@ -3795,7 +3795,7 @@ if __name__ == "__main__":
         unittest.main()
     else:
         try:
-            logger.info(f"Server starting on http://localhost:{PORT}")
+            logger.info(f"Server starting on port {PORT}")
             with ThreadedTCPServer(("", PORT), F1SimHandler) as httpd:
                 httpd.serve_forever()
         except KeyboardInterrupt:
